@@ -1,0 +1,6 @@
+- name: Run a Container
+  hosts: localhost
+  become: yes
+  tasks:
+   - name: Run Docker container
+      command: "docker run -d --name nginx laravel-nginx:latest "
