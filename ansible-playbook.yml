@@ -4,4 +4,4 @@
   become: yes
   tasks:
    - name: Run Docker container
-      command: "docker run -d --name nginx vaibhavthodsare/laravel-nginx:latest "
+     command: "docker run -d --name nginx vaibhavthodsare/laravel-nginx:latest "
