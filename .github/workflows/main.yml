@@ -56,5 +56,5 @@ jobs:
         script: |
           sudo yum install docker -y
           sudo systemctl start docker
-          wget https://github.com/vaibhavthodsare/laravelwebapp/blob/6e76edd0935547a511b6e5122cea3fb01cb321f0/ansible-playbook.yml
-          ansible-playbook -i 127.0.0.1 ansible-playbook.yml
+          wget https://github.com/vaibhavthodsare/laravelwebapp/raw/main/ansible-playbook.yml
+          ansible-playbook ansible-playbook.yml
