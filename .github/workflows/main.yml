@@ -1,0 +1,59 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Set up PHP, Composer, Node.js, and npm
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1' # Adjust to your PHP version
+        tools: composer,npm
+
+    - name: Install MySQL Client
+      run: sudo apt-get install mysql-client
+
+    - name: Install Laravel Dependencies
+      run: |
+        composer install
+        npm install
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: dockerfile
+        push: true
+        tags: vaibhavthodsare/laravel-nginx
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}    
+    - name: SSH into EC2 and Execute Commands
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user  # or your SSH username
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          sudo yum install docker -y
+          sudo systemctl start docker
+          ansible-playbook -i 127.0.0.1 ansible-playbook.yml
